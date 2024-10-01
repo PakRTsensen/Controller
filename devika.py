@@ -124,7 +124,11 @@ def get_agent_state():
 @route_logger(logger)
 def browser_snapshot():
     snapshot_path = request.args.get("snapshot_path")
-    return send_file(snapshot_path, as_attachment=True)
+    base_path = "/safe/directory/for/snapshots"  # Define your safe base directory here
+    fullpath = os.path.normpath(os.path.join(base_path, snapshot_path))
+    if not fullpath.startswith(base_path):
+        return jsonify({"error": "Invalid snapshot path"}), 400
+    return send_file(fullpath, as_attachment=True)
 
 
 @app.route("/api/get-browser-session", methods=["GET"])
